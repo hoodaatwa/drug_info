@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drug Dosage Information</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .warning {
+            color: red;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px 0;
+            width: calc(100% - 22px);
+        }
+        button {
+            padding: 10px 15px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Drug Dosage Information</h1>
+        <input type="text" id="drugName" placeholder="Enter drug name (e.g., acetaminophen)" />
+        <button onclick="fetchDrugData()">Search</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function fetchDrugData() {
+            const drugName = document.getElementById('drugName').value;
+            const apiUrl = `https://api.fda.gov/drug/label.json?search=${drugName}`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.results && data.results.length > 0) {
+                    const drugInfo = data.results[0];
+
+                    // Extract relevant information
+                    const maxDose = drugInfo.dosage_and_administration.join(" ");
+                    const warnings = drugInfo.warnings.join(" ");
+                    const purpose = drugInfo.purpose.join(" ");
+                    const brandNames = drugInfo.openfda.brand_name.join(", ");
+                    
+                    // Additional information
+                    const generalPrecautions = drugInfo.general_precautions ? drugInfo.general_precautions.join(" ") : "No general precautions available.";
+                    const drugInteractions = drugInfo.drug_interactions ? drugInfo.drug_interactions.join(" ") : "No drug interactions available.";
+                    const pregnancy = drugInfo.pregnancy ? drugInfo.pregnancy.join(" ") : "No pregnancy information available.";
+                    const nursingMothers = drugInfo.nursing_mothers ? drugInfo.nursing_mothers.join(" ") : "No information for nursing mothers available.";
+                    const pediatricUse = drugInfo.pediatric_use ? drugInfo.pediatric_use.join(" ") : "No pediatric use information available.";
+                    const adverseReactions = drugInfo.adverse_reactions ? drugInfo.adverse_reactions.join(" ") : "No adverse reactions reported.";
+                    
+                    // Display results
+                    document.getElementById('result').innerHTML = `
+                        <h2>Brand Names</h2>
+                        <p>${brandNames}</p>
+                        <h3>Active Ingredient</h3>
+                        <p>${drugInfo.active_ingredient.join(", ")}</p>
+                        <h3>Purpose</h3>
+                        <p>${purpose}</p>
+                        <h3>Maximum Dosage</h3>
+                        <p>${maxDose}</p>
+                        <h3>Warnings</h3>
+                        <p class="warning">${warnings}</p>
+                        <h3>General Precautions</h3>
+                        <p>${generalPrecautions}</p>
+                        <h3>Drug Interactions</h3>
+                        <p>${drugInteractions}</p>
+                        <h3>Pregnancy</h3>
+                        <p>${pregnancy}</p>
+                        <h3>Nursing Mothers</h3>
+                        <p>${nursingMothers}</p>
+                        <h3>Pediatric Use</h3>
+                        <p>${pediatricUse}</p>
+                        <h3>Adverse Reactions</h3>
+                        <p>${adverseReactions}</p>
+                    `;
+                } else {
+                    document.getElementById('result').innerHTML = `<p>No results found for "${drugName}".</p>`;
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                document.getElementById('result').innerHTML = "<p>Error fetching data. Please try again later.</p>";
+            }
+        }
+    </script>
+</body>
+</html>
