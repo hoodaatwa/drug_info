@@ -222,6 +222,7 @@ background: #ffffff;
     </div>
 
     
+                    
 <script>
     let suggestionTimeout;
     let currentDrugInfo = {};
@@ -357,8 +358,8 @@ background: #ffffff;
                 // Dynamically create section options based on available data
                 updateSectionOptions();
 
-                // Fetch and display similar books
-                fetchSimilarBooks(drugName);
+                // Fetch and display similar books with "drug" prepended to the name
+                fetchSimilarBooks(`drug ${drugName}`);
             } else {
                 document.getElementById('error').innerText = `No results found for "${drugName}".`;
                 document.getElementById('sectionOptions').style.display = 'none'; // Hide section options
@@ -494,8 +495,7 @@ background: #ffffff;
     // Validate input on input change
     document.getElementById('drugName').addEventListener('input', validateInput);
 </script>
-
-                    
+          
     
 
 </body>
