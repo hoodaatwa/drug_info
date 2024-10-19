@@ -208,12 +208,15 @@ background: #ffffff;
     <script>
     let suggestionTimeout;
     let currentDrugInfo = {};
+    let selectedDrugName = ''; // Store the selected drug name
 
     function suggestDrugs() {
         const query = document.getElementById('drugName').value.trim().toLowerCase();
         const suggestionsContainer = document.getElementById('suggestions');
+        const searchButton = document.getElementById('searchButton');
         
         clearTimeout(suggestionTimeout);
+        selectedDrugName = ''; // Reset selected drug name
 
         if (query.length > 2) {
             suggestionTimeout = setTimeout(async () => {
@@ -240,8 +243,10 @@ background: #ffffff;
                             suggestionItem.textContent = name;
                             suggestionItem.onclick = () => {
                                 document.getElementById('drugName').value = name;
+                                selectedDrugName = name.toLowerCase(); // Store the selected drug name
                                 suggestionsContainer.innerHTML = '';
                                 suggestionsContainer.style.display = 'none';
+                                searchButton.disabled = false; // Enable the search button
                             };
                             suggestionsContainer.appendChild(suggestionItem);
                         });
@@ -257,6 +262,7 @@ background: #ffffff;
         } else {
             suggestionsContainer.innerHTML = '';
             suggestionsContainer.style.display = 'none';
+            searchButton.disabled = true; // Disable the search button if input is too short
         }
     }
 
@@ -277,6 +283,13 @@ function hideSuggestions() {
     }, 200);
 }
 
+
+    function validateInput() {
+        const input = document.getElementById('drugName').value.trim().toLowerCase();
+        const searchButton = document.getElementById('searchButton');
+        // Enable the search button only if the input matches the selected drug name
+        searchButton.disabled = input !== selectedDrugName;
+    }
 
     async function fetchDrugData() {
         const drugName = document.getElementById('drugName').value.trim();
