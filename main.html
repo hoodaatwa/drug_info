@@ -336,8 +336,9 @@ background: #ffffff;
 
     async function fetchDrugData() {
         const drugName = document.getElementById('drugName').value.trim();
-        const apiUrl = `https://api.fda.gov/drug/label.json?search=${drugName}`;
-        document.getElementById('loading').style.display = 'block';
+        const apiUrl = `https://api.fda.gov/drug/label.json?search=openfda.generic_name:"${drugName}"`;
+        
+document.getElementById('loading').style.display = 'block';
         document.getElementById('error').innerText = '';
         document.getElementById('result').innerHTML = '';
         document.getElementById('suggestions').style.display = 'none';
@@ -477,4 +478,4 @@ background: #ffffff;
     
 
 </body>
-    </html>
+</html>
