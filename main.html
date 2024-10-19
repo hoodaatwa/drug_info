@@ -204,7 +204,7 @@ background: #ffffff;
         <h1>Drug Information</h1>
         <input type="text" id="drugName" placeholder="Enter drug name (e.g., acetaminophen)" oninput="suggestDrugs()" onblur="hideSuggestions()" />
         <div id="suggestions" class="suggestions"></div>
-        <button onclick="fetchDrugData()">Search</button>
+        <button class ="search" onclick="fetchDrugData()">Search</button>
         
         <div id="loading" class="loading">Loading data, please wait...</div>
         <div id="error" class="error"></div>
