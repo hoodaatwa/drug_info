@@ -222,13 +222,12 @@ background: #ffffff;
     </div>
 
     
-                    
+
 <script>
     let suggestionTimeout;
     let currentDrugInfo = {};
     let selectedDrugName = ''; // Store the selected drug name
-    const debounceDelay = 500; // Adjusted debounce time
-    const recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || []; // Cache for recent searches
+    const debounceDelay = 300; // Adjusted debounce time
 
     function suggestDrugs() {
         const query = document.getElementById('drugName').value.trim().toLowerCase();
@@ -251,16 +250,19 @@ background: #ffffff;
 
                     if (data.results && data.results.length > 0) {
                         const uniqueGenericNames = new Set();
+
+                        // Collect all unique generic names
                         data.results.forEach(result => {
                             const genericNames = result.openfda.generic_name || [];
                             genericNames.forEach(name => {
-                                if (name.toLowerCase().includes(query)) {
-                                    uniqueGenericNames.add(name);
-                                }
+                                uniqueGenericNames.add(name);
                             });
                         });
 
-                        uniqueGenericNames.forEach(name => {
+                        // Convert Set to Array and limit to 10 unique names
+                        const suggestionsArray = Array.from(uniqueGenericNames).slice(0, 10);
+
+                        suggestionsArray.forEach(name => {
                             const suggestionItem = document.createElement('div');
                             suggestionItem.className = 'suggestion-item';
                             suggestionItem.textContent = name;
@@ -270,16 +272,15 @@ background: #ffffff;
                                 suggestionsContainer.innerHTML = '';
                                 suggestionsContainer.style.display = 'none';
                                 searchButton.disabled = false; // Enable the search button
-                                cacheRecentSearch(name); // Cache the selected drug name
                             };
                             suggestionsContainer.appendChild(suggestionItem);
                         });
 
-                        if (uniqueGenericNames.size > 0) {
+                        if (suggestionsArray.length > 0) {
                             suggestionsContainer.style.display = 'block';
                         }
                     } else {
-                        suggestionsContainer.innerHTML = '<div class="no-results">No suggestions found. Try refining your search.</div>';
+                        suggestionsContainer.innerHTML = '<div class="no-results">No suggestions found. Try refining your search. Write the full name of the medication.</div>';
                         suggestionsContainer.style.display = 'block';
                     }
                 } catch (error) {
@@ -404,31 +405,6 @@ background: #ffffff;
         }
     }
 
-    function cacheRecentSearch(query) {
-        if (!recentSearches.includes(query)) {
-            recentSearches.push(query);
-            localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
-        }
-    }
-
-    function showRecentSearches() {
-        const suggestionsContainer = document.getElementById('suggestions');
-        recentSearches.forEach(search => {
-            const suggestionItem = document.createElement('div');
-            suggestionItem.className = 'suggestion-item';
-            suggestionItem.textContent = search;
-            suggestionItem.onclick = () => {
-                document.getElementById('drugName').value = search;
-                selectedDrugName = search.toLowerCase(); // Store the selected drug name
-                suggestionsContainer.innerHTML = '';
-                suggestionsContainer.style.display = 'none';
-                document.getElementById('searchButton').disabled = false; // Enable the search button
-            };
-            suggestionsContainer.appendChild(suggestionItem);
-        });
-        suggestionsContainer.style.display = 'block';
-    }
-
     function updateSectionOptions() {
         const sectionOptions = document.getElementById('sectionOptions');
         sectionOptions.innerHTML = '';
@@ -495,8 +471,9 @@ background: #ffffff;
     // Validate input on input change
     document.getElementById('drugName').addEventListener('input', validateInput);
 </script>
+
           
     
 
 </body>
-</html>
+    </html>
