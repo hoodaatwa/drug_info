@@ -29,7 +29,7 @@
         input[type="text"] {
             padding: 12px 15px;
             margin: 10px 0;
-            width: calc(100% - 30px); /* Adjusted width */
+            width: calc(100% - 30px);
             border-radius: 5px;
             border: 1px solid #ddd;
             font-size: 16px;
@@ -41,11 +41,11 @@
             border-top: none;
             max-height: 150px;
             overflow-y: auto;
-            width: calc(100% - 40px); /* Adjusted width */
+            width: calc(100% - 40px);
             position: absolute;
             z-index: 1000;
             display: none;
-            border-radius: 0 0 5px 5px; /* Round the bottom corners */
+            border-radius: 0 0 5px 5px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .suggestion-item {
@@ -59,9 +59,9 @@
         .section-options {
             margin-top: 10px;
             display: flex;
-            flex-wrap: nowrap; /* No wrapping */
-            gap: 10px; /* Space between options */
-            overflow-x: auto; /* Allow horizontal scrolling if needed */
+            flex-wrap: nowrap;
+            gap: 10px;
+            overflow-x: auto;
             padding: 10px 0;
         }
         .section-option {
@@ -70,8 +70,8 @@
             background: #e3f2fd;
             border: 1px solid #90caf9;
             border-radius: 5px;
-            text-align: center; /* Center-align text */
-            min-width: 120px; /* Minimum width for each option */
+            text-align: center;
+            min-width: 120px;
             transition: background 0.2s;
         }
         .section-option:hover {
@@ -96,7 +96,7 @@
             font-weight: bold;
             display: none;
             text-align: center;
-margin-top: 20px;
+            margin-top: 20px;
         }
         .error {
             color: #d32f2f;
@@ -114,6 +114,28 @@ margin-top: 20px;
             margin: 0;
             color: #555;
         }
+        #similarBooksContainer {
+            
+            display: none;
+background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 20px auto 0;
+            position: relative;
+        }
+        #similarBooksContainer h2 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        #similarBooksContainer .book {
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -130,6 +152,12 @@ margin-top: 20px;
         <div id="sectionOptions" class="section-options" style="display: none;"></div>
 
         <div id="result"></div>
+</div>
+        <!-- Similar Books container -->
+        <div id="similarBooksContainer">
+            <h2>Similar Books</h2>
+            <div id="similarBooksList"></div>
+        </div>
     </div>
 
     <script>
@@ -201,6 +229,7 @@ margin-top: 20px;
             document.getElementById('result').innerHTML = '';
             document.getElementById('suggestions').style.display = 'none';
             document.getElementById('sectionOptions').style.display = 'block'; // Show section options
+            document.getElementById('similarBooksContainer').style.display = 'none'; // Hide similar books initially
 
             try {
                 const response = await fetch(apiUrl);
@@ -216,6 +245,9 @@ margin-top: 20px;
 
                     // Dynamically create section options based on available data
                     updateSectionOptions();
+
+                    // Fetch and display similar books
+                    fetchSimilarBooks(drugName);
                 } else {
                     document.getElementById('error').innerText = `No results found for "${drugName}".`;
                     document.getElementById('sectionOptions').style.display = 'none'; // Hide section options
@@ -228,89 +260,77 @@ margin-top: 20px;
             }
         }
 
-        function updateSectionOptions() {
-            const sectionOptions = document.getElementById('sectionOptions');
-            sectionOptions.innerHTML = ''; // Clear previous options
+        async function fetchSimilarBooks(query) {
+            const booksApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=5`;
+            const similarBooksContainer = document.getElementById('similarBooksContainer');
+            const similarBooksList = document.getElementById('similarBooksList');
 
-            const sections = [
-                { name: 'Generic Names', data: currentDrugInfo.openfda.generic_name },
-                { name: 'Brand Names', data: currentDrugInfo.openfda.brand_name },
-                { name: 'Active Ingredient', data: currentDrugInfo.active_ingredient },
-                { name: 'Purpose', data: currentDrugInfo.purpose },
-                { name: 'Maximum Dosage', data: currentDrugInfo.dosage_and_administration },
-                { name: 'Warnings', data: currentDrugInfo.warnings },
-                { name: 'General Precautions', data: currentDrugInfo.general_precautions },
-                { name: 'Drug Interactions', data: currentDrugInfo.drug_interactions },
-                { name: 'Pregnancy', data: currentDrugInfo.pregnancy },
-                { name: 'Nursing Mothers', data: currentDrugInfo.nursing_mothers },
-                { name: 'Pediatric Use', data: currentDrugInfo.pediatric_use },
-                { name: 'Adverse Reactions', data: currentDrugInfo.adverse_reactions },
-            ];
+            try {
+                const response = await fetch(booksApiUrl);
+                const data = await response.json();
+                similarBooksList.innerHTML = '';
 
-            sections.forEach(section => {
-                if (section.data && section.data.length > 0) {
-                    const option = document.createElement('div');
-                    option.className = 'section-option';
-                    option.textContent = section.name;
-                    option.onclick = () => displaySectionContent(section.name);
-                    sectionOptions.appendChild(option);
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(item => {
+                        const book = document.createElement('div');
+                        book.className = 'book';
+                        book.innerHTML = `
+                            <h3>${item.volumeInfo.title}</h3>
+                            <p>${item.volumeInfo.authors ? item.volumeInfo.authors.join(', ') : 'Unknown Author'}</p>
+                            <p>${item.volumeInfo.publishedDate}</p>
+                            <a href="${item.volumeInfo.infoLink}" target="_blank">More Info</a>
+                        `;
+                        similarBooksList.appendChild(book);
+                    });
+                    similarBooksContainer.style.display = 'block';
+                } else {
+                    similarBooksContainer.style.display = 'none';
                 }
-            });
-
-            if (sectionOptions.innerHTML === '') {
-                sectionOptions.style.display = 'none'; // Hide if no sections available
+            } catch (error) {
+                console.error('Error fetching similar books:', error);
+                similarBooksContainer.style.display = 'none';
             }
         }
 
-        function displaySectionContent(sectionName) {
-            let content = '';
-            switch (sectionName) {
-                case 'Generic Names':
-                    content = currentDrugInfo.openfda.generic_name.join(", ");
-                    break;
-                case 'Brand Names':
-                    content = currentDrugInfo.openfda.brand_name.join(", ");
-                    break;
-                case 'Active Ingredient':
-                    content = currentDrugInfo.active_ingredient.join(", ");
-                    break;
-                case 'Purpose':
-                    content = currentDrugInfo.purpose.join(", ");
-                    break;
-                case 'Maximum Dosage':
-                    content = currentDrugInfo.dosage_and_administration.join(", ");
-                    break;
-                case 'Warnings':
-                    content = currentDrugInfo.warnings.join(", ");
-                    break;
-                case 'General Precautions':
-                    content = currentDrugInfo.general_precautions.join(", ");
-                    break;
-                case 'Drug Interactions':
-                    content = currentDrugInfo.drug_interactions.join(", ");
-                    break;
-                case 'Pregnancy':
-                    content = currentDrugInfo.pregnancy.join(", ");
-                    break;
-                case 'Nursing Mothers':
-                    content = currentDrugInfo.nursing_mothers.join(", ");
-                    break;
-                case 'Pediatric Use':
-                    content = currentDrugInfo.pediatric_use.join(", ");
-                    break;
-                case 'Adverse Reactions':
-                    content = currentDrugInfo.adverse_reactions.join(", ");
-                    break;
-                default:
-                    content = "No information available.";
-            }
+        function updateSectionOptions() {
+            const sectionOptions = document.getElementById('sectionOptions');
+            sectionOptions.innerHTML = '';
 
-            // Display the selected section's content
+            const sections = [
+                { name: 'Generic Names', key: 'openfda.generic_name' },
+                { name: 'Warnings', key: 'warnings' },
+                { name: 'Active Ingredients', key: 'openfda.active_ingredient' },
+                // Add more sections as needed
+            ];
+
+            sections.forEach(section => {
+                if (currentDrugInfo[section.key.split('.')[0]]) {
+                    const option = document.createElement('div');
+                    option.className = 'section-option';
+                    option.innerText = section.name;
+                    option.onclick = () => displaySection(section.key);
+                    sectionOptions.appendChild(option);
+                }
+            });
+        }
+
+        function displaySection(key) {
             const resultContainer = document.getElementById('result');
-            resultContainer.innerHTML = `
-                <h3>${sectionName}</h3>
-                <p>${content}</p>
-            `;
+            resultContainer.innerHTML = '';
+
+            const sectionData = key.split('.').reduce((obj, k) => obj && obj[k], currentDrugInfo);
+
+            if (Array.isArray(sectionData)) {
+                sectionData.forEach(item => {
+                    const itemElement = document.createElement('p');
+                    itemElement.textContent = item;
+                    resultContainer.appendChild(itemElement);
+                });
+            } else if (sectionData) {
+                resultContainer.innerHTML = `<p>${sectionData}</p>`;
+            } else {
+                resultContainer.innerHTML = `<p>No information available for this section.</p>`;
+            }
         }
     </script>
 </body>
