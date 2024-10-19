@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drug Dosage Information</title>
+    <title>Drug Information</title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
     <style>
         body {
@@ -17,7 +17,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            max-width: 700px;
             margin: auto;
             position: relative;
         }
@@ -121,26 +121,71 @@ background: #ffffff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            max-width: 700px;
             margin: 20px auto 0;
             position: relative;
         }
+#similarBooksList {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+}
         #similarBooksContainer h2 {
             color: #1976d2;
-            margin-bottom: 10px;
+    margin-bottom: 20px;
+    font-size: 1.6rem;
+    font-weight: 500;
+    text-align: center;
         }
-        #similarBooksContainer .book {
-            padding: 10px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
+        .book {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 250px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: center;
+}
+
+.book:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+.book h3 {
+    font-size: 1.3rem;
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+.book p {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.book a {
+    display: inline-block;
+    padding: 8px 15px;
+    background-color: #1976d2;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    transition: background-color 0.3s ease;
+}
+
+.book a:hover {
+    background-color: #1565c0;
+}
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Drug Dosage Information</h1>
+        <h1>Drug Information</h1>
         <input type="text" id="drugName" placeholder="Enter drug name (e.g., acetaminophen)" oninput="suggestDrugs()" onblur="hideSuggestions()" />
         <div id="suggestions" class="suggestions"></div>
         <button onclick="fetchDrugData()">Search</button>
@@ -261,7 +306,7 @@ background: #ffffff;
         }
 
         async function fetchSimilarBooks(query) {
-            const booksApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=5`;
+            const booksApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10`;
             const similarBooksContainer = document.getElementById('similarBooksContainer');
             const similarBooksList = document.getElementById('similarBooksList');
 
