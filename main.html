@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -205,16 +206,22 @@ background: #ffffff;
         </div>
     </div>
 
-    <script>
+    
+<script>
     let suggestionTimeout;
     let currentDrugInfo = {};
     let selectedDrugName = ''; // Store the selected drug name
+    const debounceDelay = 500; // Adjusted debounce time
+    const recentSearches = JSON.parse(localStorage.getItem('recentSearches')) || []; // Cache for recent searches
 
     function suggestDrugs() {
         const query = document.getElementById('drugName').value.trim().toLowerCase();
         const suggestionsContainer = document.getElementById('suggestions');
         const searchButton = document.getElementById('searchButton');
-        
+
+        // Show a loading indicator while fetching suggestions
+        suggestionsContainer.innerHTML = '<div class="loading-spinner"></div>';
+
         clearTimeout(suggestionTimeout);
         selectedDrugName = ''; // Reset selected drug name
 
@@ -247,6 +254,7 @@ background: #ffffff;
                                 suggestionsContainer.innerHTML = '';
                                 suggestionsContainer.style.display = 'none';
                                 searchButton.disabled = false; // Enable the search button
+                                cacheRecentSearch(name); // Cache the selected drug name
                             };
                             suggestionsContainer.appendChild(suggestionItem);
                         });
@@ -254,11 +262,15 @@ background: #ffffff;
                         if (uniqueGenericNames.size > 0) {
                             suggestionsContainer.style.display = 'block';
                         }
+                    } else {
+                        suggestionsContainer.innerHTML = '<div class="no-results">No suggestions found. Try refining your search.</div>';
+                        suggestionsContainer.style.display = 'block';
                     }
                 } catch (error) {
                     console.error('Error fetching suggestions:', error);
+                    suggestionsContainer.innerHTML = '<div class="no-results">Network error. Please check your connection.</div>';
                 }
-            }, 300);
+            }, debounceDelay);
         } else {
             suggestionsContainer.innerHTML = '';
             suggestionsContainer.style.display = 'none';
@@ -267,28 +279,41 @@ background: #ffffff;
     }
 
     document.addEventListener('click', function(event) {
-    const suggestionsContainer = document.getElementById('suggestions');
-    const drugInput = document.getElementById('drugName');
-    
-    // If the click is outside the suggestions container or input field, hide the suggestions
-    if (!suggestionsContainer.contains(event.target) && !drugInput.contains(event.target)) {
-        suggestionsContainer.style.display = 'none';
+        const suggestionsContainer = document.getElementById('suggestions');
+        const drugInput = document.getElementById('drugName');
+
+        // If the click is outside the suggestions container or input field, hide the suggestions
+        if (!suggestionsContainer.contains(event.target) && !drugInput.contains(event.target)) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+
+    function hideSuggestions() {
+        // Slight delay to allow clicks on suggestions before hiding
+        setTimeout(() => {
+            document.getElementById('suggestions').style.display = 'none';
+        }, 200);
     }
-});
-
-function hideSuggestions() {
-    // Slight delay to allow clicks on suggestions before hiding
-    setTimeout(() => {
-        document.getElementById('suggestions').style.display = 'none';
-    }, 200);
-}
-
 
     function validateInput() {
         const input = document.getElementById('drugName').value.trim().toLowerCase();
         const searchButton = document.getElementById('searchButton');
         // Enable the search button only if the input matches the selected drug name
         searchButton.disabled = input !== selectedDrugName;
+    }
+
+    async function fetchWithRetry(url, retries = 3, delay = 1000) {
+        try {
+            const response = await fetch(url);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return await response.json();
+        } catch (error) {
+            if (retries > 0) {
+                setTimeout(() => fetchWithRetry(url, retries - 1, delay * 2), delay);
+            } else {
+                throw error;
+            }
+        }
     }
 
     async function fetchDrugData() {
@@ -302,13 +327,7 @@ function hideSuggestions() {
         document.getElementById('similarBooksContainer').style.display = 'none'; // Hide similar books initially
 
         try {
-            const response = await fetch(apiUrl);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
+            const data = await fetchWithRetry(apiUrl);
 
             if (data.results && data.results.length > 0) {
                 currentDrugInfo = data.results[0];
@@ -362,6 +381,31 @@ function hideSuggestions() {
         }
     }
 
+    function cacheRecentSearch(query) {
+        if (!recentSearches.includes(query)) {
+            recentSearches.push(query);
+            localStorage.setItem('recentSearches', JSON.stringify(recentSearches));
+        }
+    }
+
+    function showRecentSearches() {
+        const suggestionsContainer = document.getElementById('suggestions');
+        recentSearches.forEach(search => {
+            const suggestionItem = document.createElement('div');
+            suggestionItem.className = 'suggestion-item';
+            suggestionItem.textContent = search;
+            suggestionItem.onclick = () => {
+                document.getElementById('drugName').value = search;
+                selectedDrugName = search.toLowerCase(); // Store the selected drug name
+                suggestionsContainer.innerHTML = '';
+                suggestionsContainer.style.display = 'none';
+                document.getElementById('searchButton').disabled = false; // Enable the search button
+            };
+            suggestionsContainer.appendChild(suggestionItem);
+        });
+        suggestionsContainer.style.display = 'block';
+    }
+
     function updateSectionOptions() {
         const sectionOptions = document.getElementById('sectionOptions');
         sectionOptions.innerHTML = '';
@@ -383,40 +427,44 @@ function hideSuggestions() {
 
         // Loop through the sections and only display the ones with available data
         sections.forEach(section => {
-            if (section.data && (Array.isArray(section.data) ? section.data.length > 0 : true)) {
-                const option = document.createElement('div');
-                option.className = 'section-option';
-                option.innerText = section.name;
-                option.onclick = () => displaySection(section.data);
-                sectionOptions.appendChild(option);
+            if (section.data && section.data.length > 0) {
+                const sectionButton = document.createElement('button');
+                sectionButton.textContent = section.name;
+                sectionButton.onclick = () => displaySection(section.data);
+                sectionOptions.appendChild(sectionButton);
             }
         });
-
-        // If no valid sections, hide the section options container
-        if (sectionOptions.children.length === 0) {
-            sectionOptions.style.display = 'none';
-        } else {
-            sectionOptions.style.display = 'flex';
-        }
     }
 
     function displaySection(data) {
         const resultContainer = document.getElementById('result');
         resultContainer.innerHTML = '';
 
+        const collapsible = document.createElement('div');
+        collapsible.className = 'collapsible-section';
+
         if (Array.isArray(data)) {
             data.forEach(item => {
                 const itemElement = document.createElement('p');
                 itemElement.textContent = item;
-                resultContainer.appendChild(itemElement);
+                collapsible.appendChild(itemElement);
             });
         } else if (data) {
-            resultContainer.innerHTML = `<p>${data}</p>`;
+            collapsible.innerHTML = `<p>${data}</p>`;
         } else {
-            resultContainer.innerHTML = `<p>No information available for this section.</p>`;
+            collapsible.innerHTML = `<p>No information available for this section.</p>`;
         }
+
+        resultContainer.appendChild(collapsible);
     }
+
+    // Call showRecentSearches on page load to show cached recent searches
+    document.addEventListener('DOMContentLoaded', showRecentSearches);
+
+    // Validate input on input change
+    document.getElementById('drugName').addEventListener('input', validateInput);
 </script>
+
 
 </body>
 </html>
