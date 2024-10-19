@@ -341,6 +341,13 @@ background: #ffffff;
         document.getElementById('sectionOptions').style.display = 'block'; // Show section options
         document.getElementById('similarBooksContainer').style.display = 'none'; // Hide similar books initially
 
+        // Validate input: check if drugName is empty
+        if (!drugName) {
+            document.getElementById('error').innerText = 'Error: Drug name cannot be empty.';
+            document.getElementById('loading').style.display = 'none';
+            return;
+        }
+
         try {
             const data = await fetchWithRetry(apiUrl);
 
@@ -442,13 +449,21 @@ background: #ffffff;
 
         // Loop through the sections and only display the ones with available data
         sections.forEach(section => {
-            if (section.data && section.data.length > 0) {
-                const sectionButton = document.createElement('button');
-                sectionButton.textContent = section.name;
-                sectionButton.onclick = () => displaySection(section.data);
-                sectionOptions.appendChild(sectionButton);
+            if (section.data && (Array.isArray(section.data) ? section.data.length > 0 : true)) {
+                const option = document.createElement('div');
+                option.className = 'section-option';
+                option.innerText = section.name;
+                option.onclick = () => displaySection(section.data);
+                sectionOptions.appendChild(option);
             }
         });
+
+        // If no valid sections, hide the section options container
+        if (sectionOptions.children.length === 0) {
+            sectionOptions.style.display = 'none';
+        } else {
+            sectionOptions.style.display = 'flex';
+        }
     }
 
     function displaySection(data) {
@@ -480,6 +495,8 @@ background: #ffffff;
     document.getElementById('drugName').addEventListener('input', validateInput);
 </script>
 
+                    
+    
 
 </body>
 </html>
