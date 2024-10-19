@@ -260,11 +260,23 @@ background: #ffffff;
             }
         }
 
-        function hideSuggestions() {
-            setTimeout(() => {
-                document.getElementById('suggestions').style.display = 'none';
-            }, 200);
-        }
+        document.addEventListener('click', function(event) {
+    const suggestionsContainer = document.getElementById('suggestions');
+    const drugInput = document.getElementById('drugName');
+    
+    // If the click is outside the suggestions container or input field, hide the suggestions
+    if (!suggestionsContainer.contains(event.target) && !drugInput.contains(event.target)) {
+        suggestionsContainer.style.display = 'none';
+    }
+});
+
+function hideSuggestions() {
+    // Slight delay to allow clicks on suggestions before hiding
+    setTimeout(() => {
+        document.getElementById('suggestions').style.display = 'none';
+    }, 200);
+}
+
 
         async function fetchDrugData() {
             const drugName = document.getElementById('drugName').value.trim();
