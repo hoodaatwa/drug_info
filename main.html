@@ -222,7 +222,6 @@ background: #ffffff;
     </div>
 
     
-
 <script>
     let suggestionTimeout;
     let currentDrugInfo = {};
@@ -262,26 +261,28 @@ background: #ffffff;
                         // Convert Set to Array and limit to 10 unique names
                         const suggestionsArray = Array.from(uniqueGenericNames).slice(0, 10);
 
-                        suggestionsArray.forEach(name => {
-                            const suggestionItem = document.createElement('div');
-                            suggestionItem.className = 'suggestion-item';
-                            suggestionItem.textContent = name;
-                            suggestionItem.onclick = () => {
-                                document.getElementById('drugName').value = name;
-                                selectedDrugName = name.toLowerCase(); // Store the selected drug name
-                                suggestionsContainer.innerHTML = '';
-                                suggestionsContainer.style.display = 'none';
-                                searchButton.disabled = false; // Enable the search button
-                            };
-                            suggestionsContainer.appendChild(suggestionItem);
-                        });
-
                         if (suggestionsArray.length > 0) {
+                            suggestionsArray.forEach(name => {
+                                const suggestionItem = document.createElement('div');
+                                suggestionItem.className = 'suggestion-item';
+                                suggestionItem.textContent = name;
+                                suggestionItem.onclick = () => {
+                                    document.getElementById('drugName').value = name;
+                                    selectedDrugName = name.toLowerCase(); // Store the selected drug name
+                                    suggestionsContainer.innerHTML = '';
+                                    suggestionsContainer.style.display = 'none';
+                                    searchButton.disabled = false; // Enable the search button
+                                };
+                                suggestionsContainer.appendChild(suggestionItem);
+                            });
                             suggestionsContainer.style.display = 'block';
+                        } else {
+                            // No valid suggestions found
+                            suggestionsContainer.innerHTML = '<div class="no-results">No suggestions found. Try refining your search.</div>';
                         }
                     } else {
-                        suggestionsContainer.innerHTML = '<div class="no-results">No suggestions found. Try refining your search. Write the full name of the medication.</div>';
-                        suggestionsContainer.style.display = 'block';
+                        // No results returned from the API
+                        suggestionsContainer.innerHTML = '<div class="no-results">No suggestions found. Try refining your search.</div>';
                     }
                 } catch (error) {
                     console.error('Error fetching suggestions:', error);
