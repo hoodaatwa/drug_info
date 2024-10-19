@@ -59,7 +59,7 @@
         .section-options {
             margin-top: 10px;
             display: flex;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             gap: 10px;
             overflow-x: auto;
             padding: 10px 0;
@@ -71,7 +71,7 @@
             border: 1px solid #90caf9;
             border-radius: 5px;
             text-align: center;
-            min-width: 120px;
+            width: 100%;
             transition: background 0.2s;
         }
         .section-option:hover {
@@ -132,7 +132,7 @@ background: #ffffff;
     justify-content: center;
 }
         #similarBooksContainer h2 {
-            color: #1976d2;
+            color: #333;
     margin-bottom: 20px;
     font-size: 1.6rem;
     font-weight: 500;
@@ -206,189 +206,190 @@ background: #ffffff;
     </div>
 
     <script>
-        let suggestionTimeout;
-        let currentDrugInfo = {};
+    let suggestionTimeout;
+    let currentDrugInfo = {};
 
-        function suggestDrugs() {
-            const query = document.getElementById('drugName').value.trim().toLowerCase();
-            const suggestionsContainer = document.getElementById('suggestions');
-            
-            clearTimeout(suggestionTimeout);
+    function suggestDrugs() {
+        const query = document.getElementById('drugName').value.trim().toLowerCase();
+        const suggestionsContainer = document.getElementById('suggestions');
+        
+        clearTimeout(suggestionTimeout);
 
-            if (query.length > 2) {
-                suggestionTimeout = setTimeout(async () => {
-                    try {
-                        const response = await fetch(`https://api.fda.gov/drug/label.json?search=${query}&limit=15`);
-                        const data = await response.json();
-                        
-                        suggestionsContainer.innerHTML = '';
+        if (query.length > 2) {
+            suggestionTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`https://api.fda.gov/drug/label.json?search=${query}&limit=15`);
+                    const data = await response.json();
+                    
+                    suggestionsContainer.innerHTML = '';
 
-                        if (data.results && data.results.length > 0) {
-                            const uniqueGenericNames = new Set();
-                            data.results.forEach(result => {
-                                const genericNames = result.openfda.generic_name || [];
-                                genericNames.forEach(name => {
-                                    if (name.toLowerCase().includes(query)) {
-                                        uniqueGenericNames.add(name);
-                                    }
-                                });
+                    if (data.results && data.results.length > 0) {
+                        const uniqueGenericNames = new Set();
+                        data.results.forEach(result => {
+                            const genericNames = result.openfda.generic_name || [];
+                            genericNames.forEach(name => {
+                                if (name.toLowerCase().includes(query)) {
+                                    uniqueGenericNames.add(name);
+                                }
                             });
+                        });
 
-                            uniqueGenericNames.forEach(name => {
-                                const suggestionItem = document.createElement('div');
-                                suggestionItem.className = 'suggestion-item';
-                                suggestionItem.textContent = name;
-                                suggestionItem.onclick = () => {
-                                    document.getElementById('drugName').value = name;
-                                    suggestionsContainer.innerHTML = '';
-                                    suggestionsContainer.style.display = 'none';
-                                };
-                                suggestionsContainer.appendChild(suggestionItem);
-                            });
+                        uniqueGenericNames.forEach(name => {
+                            const suggestionItem = document.createElement('div');
+                            suggestionItem.className = 'suggestion-item';
+                            suggestionItem.textContent = name;
+                            suggestionItem.onclick = () => {
+                                document.getElementById('drugName').value = name;
+                                suggestionsContainer.innerHTML = '';
+                                suggestionsContainer.style.display = 'none';
+                            };
+                            suggestionsContainer.appendChild(suggestionItem);
+                        });
 
-                            if (uniqueGenericNames.size > 0) {
-                                suggestionsContainer.style.display = 'block';
-                            }
+                        if (uniqueGenericNames.size > 0) {
+                            suggestionsContainer.style.display = 'block';
                         }
-                    } catch (error) {
-                        console.error('Error fetching suggestions:', error);
                     }
-                }, 300);
-            } else {
-                suggestionsContainer.innerHTML = '';
-                suggestionsContainer.style.display = 'none';
-            }
+                } catch (error) {
+                    console.error('Error fetching suggestions:', error);
+                }
+            }, 300);
+        } else {
+            suggestionsContainer.innerHTML = '';
+            suggestionsContainer.style.display = 'none';
         }
-
-        document.addEventListener('click', function(event) {
-    const suggestionsContainer = document.getElementById('suggestions');
-    const drugInput = document.getElementById('drugName');
-    
-    // If the click is outside the suggestions container or input field, hide the suggestions
-    if (!suggestionsContainer.contains(event.target) && !drugInput.contains(event.target)) {
-        suggestionsContainer.style.display = 'none';
     }
-});
 
-function hideSuggestions() {
-    // Slight delay to allow clicks on suggestions before hiding
-    setTimeout(() => {
+    function hideSuggestions() {
         document.getElementById('suggestions').style.display = 'none';
-    }, 200);
-}
+    }
 
+    async function fetchDrugData() {
+        const drugName = document.getElementById('drugName').value.trim();
+        const apiUrl = `https://api.fda.gov/drug/label.json?search=${drugName}`;
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('error').innerText = '';
+        document.getElementById('result').innerHTML = '';
+        document.getElementById('suggestions').style.display = 'none';
+        document.getElementById('sectionOptions').style.display = 'block'; // Show section options
+        document.getElementById('similarBooksContainer').style.display = 'none'; // Hide similar books initially
 
-        async function fetchDrugData() {
-            const drugName = document.getElementById('drugName').value.trim();
-            const apiUrl = `https://api.fda.gov/drug/label.json?search=${drugName}`;
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('error').innerText = '';
-            document.getElementById('result').innerHTML = '';
-            document.getElementById('suggestions').style.display = 'none';
-            document.getElementById('sectionOptions').style.display = 'block'; // Show section options
-            document.getElementById('similarBooksContainer').style.display = 'none'; // Hide similar books initially
-
-            try {
-                const response = await fetch(apiUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data = await response.json();
-
-                if (data.results && data.results.length > 0) {
-                    currentDrugInfo = data.results[0];
-
-                    // Dynamically create section options based on available data
-                    updateSectionOptions();
-
-                    // Fetch and display similar books
-                    fetchSimilarBooks(drugName);
-                } else {
-                    document.getElementById('error').innerText = `No results found for "${drugName}".`;
-                    document.getElementById('sectionOptions').style.display = 'none'; // Hide section options
-                }
-            } catch (error) {
-                document.getElementById('error').innerText = `Error fetching data: ${error.message}`;
-                document.getElementById('sectionOptions').style.display = 'none'; // Hide section options
-            } finally {
-                document.getElementById('loading').style.display = 'none';
+        try {
+            const response = await fetch(apiUrl);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+
+            const data = await response.json();
+
+            if (data.results && data.results.length > 0) {
+                currentDrugInfo = data.results[0];
+
+                // Dynamically create section options based on available data
+                updateSectionOptions();
+
+                // Fetch and display similar books
+                fetchSimilarBooks(drugName);
+            } else {
+                document.getElementById('error').innerText = `No results found for "${drugName}".`;
+                document.getElementById('sectionOptions').style.display = 'none'; // Hide section options
+            }
+        } catch (error) {
+            document.getElementById('error').innerText = `Error fetching data: ${error.message}`;
+            document.getElementById('sectionOptions').style.display = 'none'; // Hide section options
+        } finally {
+            document.getElementById('loading').style.display = 'none';
         }
+    }
 
-        async function fetchSimilarBooks(query) {
-            const booksApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10`;
-            const similarBooksContainer = document.getElementById('similarBooksContainer');
-            const similarBooksList = document.getElementById('similarBooksList');
+    async function fetchSimilarBooks(query) {
+        const booksApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10`;
+        const similarBooksContainer = document.getElementById('similarBooksContainer');
+        const similarBooksList = document.getElementById('similarBooksList');
 
-            try {
-                const response = await fetch(booksApiUrl);
-                const data = await response.json();
-                similarBooksList.innerHTML = '';
+        try {
+            const response = await fetch(booksApiUrl);
+            const data = await response.json();
+            similarBooksList.innerHTML = '';
 
-                if (data.items && data.items.length > 0) {
-                    data.items.forEach(item => {
-                        const book = document.createElement('div');
-                        book.className = 'book';
-                        book.innerHTML = `
-                            <h3>${item.volumeInfo.title}</h3>
-                            <p>${item.volumeInfo.authors ? item.volumeInfo.authors.join(', ') : 'Unknown Author'}</p>
-                            <p>${item.volumeInfo.publishedDate}</p>
-                            <a href="${item.volumeInfo.infoLink}" target="_blank">More Info</a>
-                        `;
-                        similarBooksList.appendChild(book);
-                    });
-                    similarBooksContainer.style.display = 'block';
-                } else {
-                    similarBooksContainer.style.display = 'none';
-                }
-            } catch (error) {
-                console.error('Error fetching similar books:', error);
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(item => {
+                    const book = document.createElement('div');
+                    book.className = 'book';
+                    book.innerHTML = `
+                        <h3>${item.volumeInfo.title}</h3>
+                        <p>${item.volumeInfo.authors ? item.volumeInfo.authors.join(', ') : 'Unknown Author'}</p>
+                        <p>${item.volumeInfo.publishedDate}</p>
+                        <a href="${item.volumeInfo.infoLink}" target="_blank">More Info</a>
+                    `;
+                    similarBooksList.appendChild(book);
+                });
+                similarBooksContainer.style.display = 'block';
+            } else {
                 similarBooksContainer.style.display = 'none';
             }
+        } catch (error) {
+            console.error('Error fetching similar books:', error);
+            similarBooksContainer.style.display = 'none';
         }
+    }
 
-        function updateSectionOptions() {
-            const sectionOptions = document.getElementById('sectionOptions');
-            sectionOptions.innerHTML = '';
+    function updateSectionOptions() {
+        const sectionOptions = document.getElementById('sectionOptions');
+        sectionOptions.innerHTML = '';
 
-            const sections = [
-                { name: 'Generic Names', key: 'openfda.generic_name' },
-                { name: 'Warnings', key: 'warnings' },
-                { name: 'Active Ingredients', key: 'openfda.active_ingredient' },
-                // Add more sections as needed
-            ];
+        const sections = [
+            { name: 'Generic Names', data: currentDrugInfo.openfda.generic_name },
+            { name: 'Brand Names', data: currentDrugInfo.openfda.brand_name },
+            { name: 'Active Ingredient', data: currentDrugInfo.active_ingredient },
+            { name: 'Purpose', data: currentDrugInfo.purpose },
+            { name: 'Maximum Dosage', data: currentDrugInfo.dosage_and_administration },
+            { name: 'Warnings', data: currentDrugInfo.warnings },
+            { name: 'General Precautions', data: currentDrugInfo.general_precautions },
+            { name: 'Drug Interactions', data: currentDrugInfo.drug_interactions },
+            { name: 'Pregnancy', data: currentDrugInfo.pregnancy },
+            { name: 'Nursing Mothers', data: currentDrugInfo.nursing_mothers },
+            { name: 'Pediatric Use', data: currentDrugInfo.pediatric_use },
+            { name: 'Adverse Reactions', data: currentDrugInfo.adverse_reactions }
+        ];
 
-            sections.forEach(section => {
-                if (currentDrugInfo[section.key.split('.')[0]]) {
-                    const option = document.createElement('div');
-                    option.className = 'section-option';
-                    option.innerText = section.name;
-                    option.onclick = () => displaySection(section.key);
-                    sectionOptions.appendChild(option);
-                }
-            });
-        }
-
-        function displaySection(key) {
-            const resultContainer = document.getElementById('result');
-            resultContainer.innerHTML = '';
-
-            const sectionData = key.split('.').reduce((obj, k) => obj && obj[k], currentDrugInfo);
-
-            if (Array.isArray(sectionData)) {
-                sectionData.forEach(item => {
-                    const itemElement = document.createElement('p');
-                    itemElement.textContent = item;
-                    resultContainer.appendChild(itemElement);
-                });
-            } else if (sectionData) {
-                resultContainer.innerHTML = `<p>${sectionData}</p>`;
-            } else {
-                resultContainer.innerHTML = `<p>No information available for this section.</p>`;
+        // Loop through the sections and only display the ones with available data
+        sections.forEach(section => {
+            if (section.data && (Array.isArray(section.data) ? section.data.length > 0 : true)) {
+                const option = document.createElement('div');
+                option.className = 'section-option';
+                option.innerText = section.name;
+                option.onclick = () => displaySection(section.data);
+                sectionOptions.appendChild(option);
             }
+        });
+
+        // If no valid sections, hide the section options container
+        if (sectionOptions.children.length === 0) {
+            sectionOptions.style.display = 'none';
+        } else {
+            sectionOptions.style.display = 'flex';
         }
-    </script>
+    }
+
+    function displaySection(data) {
+        const resultContainer = document.getElementById('result');
+        resultContainer.innerHTML = '';
+
+        if (Array.isArray(data)) {
+            data.forEach(item => {
+                const itemElement = document.createElement('p');
+                itemElement.textContent = item;
+                resultContainer.appendChild(itemElement);
+            });
+        } else if (data) {
+            resultContainer.innerHTML = `<p>${data}</p>`;
+        } else {
+            resultContainer.innerHTML = `<p>No information available for this section.</p>`;
+        }
+    }
+</script>
+
 </body>
 </html>
