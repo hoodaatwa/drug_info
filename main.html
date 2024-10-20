@@ -368,11 +368,14 @@ document.getElementById('loading').style.display = 'block';
                 document.getElementById('sectionOptions').style.display = 'none'; // Hide section options
             }
         } catch (error) {
+        if (error.message.includes("Cannot read properties of undefined (reading 'results')")) {
+            document.getElementById('error').innerText = 'No data found. Please pick one of the suggested options from the list.';
+        } else {
             document.getElementById('error').innerText = `Error fetching data: ${error.message}`;
-            document.getElementById('sectionOptions').style.display = 'none'; // Hide section options
-        } finally {
-            document.getElementById('loading').style.display = 'none';
         }
+        document.getElementById('sectionOptions').style.display = 'none';
+    } finally {
+        document.getElementById('loading').style.display = 'none';
     }
 
     async function fetchSimilarBooks(query) {
