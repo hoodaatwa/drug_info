@@ -336,7 +336,7 @@ background: #ffffff;
 
     async function fetchDrugData() {
         const drugName = document.getElementById('drugName').value.trim();
-        const apiUrl = `https://api.fda.gov/drug/label.json?search=openfda.generic_name:"${drugName}"`;
+        const apiUrl = `https://api.fda.gov/drug/label.json?search=openfda.generic_name.exact:"${drugName}"`;
         
 document.getElementById('loading').style.display = 'block';
         document.getElementById('error').innerText = '';
