@@ -380,7 +380,7 @@ document.getElementById('loading').style.display = 'block';
     }
 
     async function fetchSimilarBooks(query) {
-        const booksApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10`;
+        const booksApiUrl = `https://www.googleapis.com/books/v1/volumes?q='drug'_${query}&maxResults=4`;
         const similarBooksContainer = document.getElementById('similarBooksContainer');
         const similarBooksList = document.getElementById('similarBooksList');
 
