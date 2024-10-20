@@ -199,7 +199,36 @@ background: #ffffff;
 .book a:hover {
     background-color: #1565c0;
 }
+#googleSearchButton {
+        background-color: #4285F4; /* Google's blue */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 14px;
+        border-radius: 4px;
+        cursor: pointer;
+        display: inline-block;
+        margin-top: 10px;
+        text-align: center;
+        transition: background-color 0.3s ease;
+        width:auto;
+    }
 
+    #googleSearchButton:hover {
+        background-color: #357ae8; /* Slightly darker blue for hover effect */
+    }
+
+    #googleSearchButton:focus {
+        outline: none;
+        box-shadow: 0 0 4px #4285F4;
+    }
+
+    #googleSearchButton img {
+        width: 16px;
+        height: 16px;
+        vertical-align: middle;
+        margin-right: 8px;
+    }
     </style>
 </head>
 <body>
@@ -372,7 +401,13 @@ document.getElementById('loading').style.display = 'block';
             }
         } catch (error) {
         if (error.message.includes("Cannot read properties of undefined (reading 'results')")) {
-            document.getElementById('error').innerText = 'No data found. Please pick one of the suggested options from the list.';
+            document.getElementById('error').innerHTML =  `No data found. Please pick one of the suggested options from the list.
+            <br>
+            <button id="googleSearchButton" onclick="googleSearch('${drugName}')">
+                <img src="https://www.google.com/favicon.ico" alt="Google Logo">
+                Search "${drugName}" on Google
+            </button>
+        `;
         } else {
             document.getElementById('error').innerText = `Error fetching data: ${error.message}`;
         }
