@@ -377,6 +377,7 @@ document.getElementById('loading').style.display = 'block';
     } finally {
         document.getElementById('loading').style.display = 'none';
     }
+    }
 
     async function fetchSimilarBooks(query) {
         const booksApiUrl = `https://www.googleapis.com/books/v1/volumes?q=${query}&maxResults=10`;
