@@ -72,7 +72,7 @@
             display: block;
         }
         .container {
-            background: #FDFAD9;
+            background: #FDFAD9 ;
             padding: 10px 20px;
             border-radius: 8px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -326,9 +326,9 @@ The search engines have a href in their search engine and display them in a diff
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
-    
+    <h1>Drug Information</h1>
     <div class="container">
-        <h1>Drug Information</h1>
+        
         <input type="text" id="drugName" placeholder="Enter drug name (e.g., acetaminophen)" oninput="suggestDrugs()" onblur="hideSuggestions()" />
         <div id="suggestions" class="suggestions"></div>
         <button class ="search" onclick="fetchDrugData()">Search</button>
