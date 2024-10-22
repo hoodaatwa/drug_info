@@ -533,7 +533,8 @@ background: #ffffff;
       padding: 20px;
       text-align: center;
       position: relative;
-color:black;
+      color: black;
+      margin-top: -20px;
     }
 
 
@@ -613,30 +614,12 @@ color:black;
   </style>
 </head>
 <body>
-<button class="menu-toggle" onclick="toggleMenu()">☰</button>
 
     <div class="off-canvas" id="offCanvasMenu">
-                <button class="menu-toggle" onclick="toggleMenu()" style=" padding: 0; margin: 0;"><i class="fas fa-times" style="font-size: 50px; height: 50px; width: 50px; border: 1px sandybrown #fff;"></i>
+                <button class="menu-toggle" onclick="toggleMenu()" style=" padding: 0; margin: 0;"><i class="fas fa-bars" style="font-size: 50px;height: 50px;width: 50px;position: fixed;right: 25px;z-index: 10001;"></i></i>
 </button>
 
-    <div class="card">
-        <div class="card-content">
-            <img src="https://cdn-icons-png.flaticon.com/256/1/1176.png" alt="Pill Icon">
-            <h3>Drug Info Tool</h3>
-            <p>
-                A comprehensive tool to provide detailed drug information, interactions, dosage guidelines, and side effects. Essential for healthcare professionals and patients seeking reliable data.
-            </p>
-            <ul>
-            <li>Comprehensive drug database</li>
-            <li>Pill identifier</li>
-            <li>Drug interaction checker</li>
-            <li>Side effects information</li>
-            <li>Dosage guidance</li>
-            <li>Generic drug alternatives</li>
-        </ul>
-        </div>
-    </div>
-<br>
+    
   <div class="header">
 <h2> Tools</h2>
     <div class="circle red"></div>
@@ -671,6 +654,26 @@ color:black;
     </div>
   </div>
 </div>
+<br>
+
+<div class="card">
+        <div class="card-content">
+            <img src="https://cdn-icons-png.flaticon.com/256/1/1176.png" alt="Pill Icon">
+            <h3>Drug Info Tool</h3>
+            <p>
+                A comprehensive tool to provide detailed drug information, interactions, dosage guidelines, and side effects. Essential for healthcare professionals and patients seeking reliable data.
+            </p>
+            <ul>
+            <li>Comprehensive drug database</li>
+            <li>Pill identifier</li>
+            <li>Drug interaction checker</li>
+            <li>Side effects information</li>
+            <li>Dosage guidance</li>
+            <li>Generic drug alternatives</li>
+        </ul>
+        </div>
+    </div>
+
 
     <div id="repoList"></div>
 
