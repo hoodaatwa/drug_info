@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Drug Information</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide|Sofia|Trirong">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <style>
@@ -91,7 +93,7 @@
             font-family: 'Trirong';
             padding: 12px 15px;
             margin: 10px 0;
-            width: calc(100% - 30px);
+            width: 100%;
             border-radius: 5px;
             border: 1px solid #ddd;
             font-size: 16px;
@@ -523,6 +525,92 @@ background: #ffffff;
             background-color: #145da0;
         }
     </style>
+  <style>
+    
+
+    .header {
+      background-color: #343a40; /* Dark background for header */
+      padding: 20px;
+      text-align: center;
+      position: relative;
+color:black;
+    }
+
+
+    .header h1{
+      color: #fff; /* Dark background for header */
+    }
+
+    .circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      border: 2px solid #fff;
+    }
+
+    .circle.red {
+      background-color: #ff4d4d; /* Red */
+      left: 20px; /* Adjust left position */
+    }
+
+    .circle.green {
+      background-color: #4dff4d; /* Green */
+      left: 60px; /* Adjust left position */
+    }
+
+    .circle.blue {
+      background-color: #4d4dff; /* Blue */
+      left: 100px; /* Adjust left position */
+    }
+
+    .tools-container {
+      display: flex;
+      justify-content: space-around;
+      padding: 15px;
+      background-color: #f8f9fa;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      border-radius: 12px;
+      max-width: 900px;
+      margin: 20px auto; /* Space between header and container */
+      flex-wrap: wrap;
+    }
+
+    .tool {
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      margin: 10px;
+    }
+
+    .tool i {
+      font-size: 24px;
+    }
+
+    .tooltip-custom {
+      visibility: hidden;
+      width: 150px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px 0;
+      position: absolute;
+      z-index: 1;
+      bottom: 100%;
+      left: 50%;
+      margin-left: -75px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .tool:hover .tooltip-custom {
+      visibility: visible;
+      opacity: 1;
+    }
+  </style>
 </head>
 <body>
 <button class="menu-toggle" onclick="toggleMenu()">☰</button>
@@ -548,6 +636,42 @@ background: #ffffff;
         </ul>
         </div>
     </div>
+<br>
+  <div class="header">
+<h2> Tools</h2>
+    <div class="circle red"></div>
+    <div class="circle green"></div>
+    <div class="circle blue"></div>
+  
+
+  
+  <div class="tools-container">
+    <!-- Original Tools -->
+    <div class="tool" id="shareTool"><i class="bi bi-share"></i><br>Share</div>
+    <div class="tool" id="copyUrlTool"><i class="bi bi-link-45deg"></i><br>Copy URL</div>
+    <div class="tool" id="emailShareTool"><i class="bi bi-envelope"></i><br>Share via Email</div>
+    <div class="tool" id="printTool"><i class="bi bi-printer"></i><br>Print</div>
+    <div class="tool" id="savePdfTool"><i class="bi bi-file-earmark-pdf"></i><br>Save as PDF</div>
+    <div class="tool" id="reloadTool"><i class="bi bi-arrow-repeat"></i><br>Reload</div>
+    <div class="tool" id="zoomInTool"><i class="bi bi-zoom-in"></i><br>Zoom In</div>
+    <div class="tool" id="zoomOutTool"><i class="bi bi-zoom-out"></i><br>Zoom Out</div>
+    <div class="tool" id="fullscreenTool"><i class="bi bi-arrows-fullscreen"></i><br>Full Screen</div>
+    <div class="tool" id="scrollTopTool"><i class="bi bi-arrow-up"></i><br>Scroll Top</div>
+
+    <!-- New Tools -->
+    <div class="tool" id="toggleImagesTool"><i class="bi bi-image"></i><br>Toggle Images</div>
+    <div class="tool" id="toggleParagraphTool"><i class="bi bi-align-center"></i><br>Toggle Paragraphs</div>
+
+    <div class="tools-container" style="border: 11px dotted #ff6550;">
+      <div class="tool" id="textSizeIncreaseTool"><i class="bi bi-fonts"></i><br>Text Size +</div>
+      <div class="tool" id="textSizeDecreaseTool"><i class="bi bi-fonts"></i><br>Text Size -</div>
+      <div class="tool" id="alignCenterTool"><i class="bi bi-text-center"></i><br>Align Center</div>
+      <div class="tool" id="alignRightTool"><i class="bi bi-text-right"></i><br>Align Right</div>
+      <div class="tool" id="alignLeftTool"><i class="bi bi-text-left"></i><br>Align Left</div>
+    </div>
+  </div>
+</div>
+
     <div id="repoList"></div>
 
 
@@ -556,6 +680,7 @@ background: #ffffff;
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <h1>Drug Information</h1>
+<br >
     <div class="container">
         
         <input type="text" id="drugName" placeholder="Enter drug name (e.g., acetaminophen)" oninput="suggestDrugs()" onblur="hideSuggestions()" />
@@ -970,5 +1095,122 @@ function toggleMenu() {
         }
 
 </script>
+  <script>
+    // Share functionality
+    document.getElementById('shareTool').addEventListener('click', function() {
+      if (navigator.share) {
+        navigator.share({
+          title: document.title,
+          url: window.location.href
+        }).then(() => {
+          console.log('Thanks for sharing!');
+        }).catch(console.error);
+      } else {
+        alert('Web Share API not supported.');
+      }
+    });
+
+    // Print page
+    document.getElementById('printTool').addEventListener('click', function() {
+      window.print();
+    });
+
+    // Reload page
+    document.getElementById('reloadTool').addEventListener('click', function() {
+      location.reload();
+    });
+
+    // Zoom in
+    document.getElementById('zoomInTool').addEventListener('click', function() {
+      document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) + 0.1).toString();
+    });
+
+    // Zoom out
+    document.getElementById('zoomOutTool').addEventListener('click', function() {
+      document.body.style.zoom = (parseFloat(document.body.style.zoom || 1) - 0.1).toString();
+    });
+
+    // Fullscreen
+    document.getElementById('fullscreenTool').addEventListener('click', function() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    });
+
+    // Copy URL
+    document.getElementById('copyUrlTool').addEventListener('click', function() {
+      navigator.clipboard.writeText(window.location.href).then(() => {
+        alert('URL copied to clipboard');
+      });
+    });
+
+    // Save page as PDF
+    document.getElementById('savePdfTool').addEventListener('click', function() {
+      window.print();
+    });
+
+    // Scroll to top
+    document.getElementById('scrollTopTool').addEventListener('click', function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Share via Email
+    document.getElementById('emailShareTool').addEventListener('click', function() {
+      window.location.href = `mailto:?subject=${document.title}&body=${window.location.href}`;
+    });
+
+    // Text size increase for paragraphs only
+    document.getElementById('textSizeIncreaseTool').addEventListener('click', function() {
+      const paragraphs = document.querySelectorAll('p');
+      paragraphs.forEach(p => {
+        p.style.fontSize = (parseFloat(getComputedStyle(p).fontSize) + 2) + 'px';
+      });
+    });
+
+    // Text size decrease for paragraphs only
+    document.getElementById('textSizeDecreaseTool').addEventListener('click', function() {
+      const paragraphs = document.querySelectorAll('p');
+      paragraphs.forEach(p => {
+        p.style.fontSize = (parseFloat(getComputedStyle(p).fontSize) - 2) + 'px';
+      });
+    });
+
+    // Toggle images
+    document.getElementById('toggleImagesTool').addEventListener('click', function() {
+      const images = document.querySelectorAll('img');
+      images.forEach(img => {
+        img.style.display = img.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+
+    // Toggle paragraphs
+    document.getElementById('toggleParagraphTool').addEventListener('click', function() {
+      const paragraphs = document.querySelectorAll('p');
+      paragraphs.forEach(p => {
+        p.style.display = p.style.display === 'none' ? 'block' : 'none';
+      });
+    });
+
+    // Align text left
+    document.getElementById('alignLeftTool').addEventListener('click', function() {
+      document.body.style.textAlign = 'left';
+    });
+
+    // Align text center
+    document.getElementById('alignCenterTool').addEventListener('click', function() {
+      document.body.style.textAlign = 'center';
+    });
+
+    // Align text right
+    document.getElementById('alignRightTool').addEventListener('click', function() {
+      document.body.style.textAlign = 'right';
+    });
+
+  </script>
+
 </body>
     </html>
