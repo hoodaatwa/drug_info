@@ -9,6 +9,95 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide|Sofia|Trirong">
  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    .outer-container {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    padding: 20px;
+    background-color: #ffffff;
+    background-size: cover;
+    background-position: center;
+    margin: 20px -20px;
+}
+.outer-container h1 {
+    text-align: center;
+    color: #6256CA;
+    margin: 0;
+    font-family: 'Audiowide';
+}
+    .container2 {
+    max-width: 100%;
+    margin: 0;
+    padding: 20px;
+    background-color: rgb(193 226 164 / 60%);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+    h1 {
+      
+      text-align: center;
+      margin-bottom: 0px;
+    }
+    .carousel-inner {
+      height: 400px;
+      display: flex;
+      align-items: center;
+    }
+    .carousel-item {
+      padding: 20px;
+    }
+    .news-item h3 {
+      margin-bottom: 10px;
+      font-size: 1.5rem;
+    }
+    .news-item p {
+      margin-bottom: 5px;
+    }
+    .news-item small {
+      color: #888;
+    }
+    .carousel-control-next, .carousel-control-prev {
+    position: absolute;
+    z-index: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+    .carousel-control-prev-icon ,  .carousel-control-next-icon{
+    background-color: black;
+    border-radius: 50%;
+}
+    /* Vertical Pagination (Carousel Indicators) */
+    .vertical-indicators {
+      position: absolute;
+      left: 50%;
+      bottom: 10px;
+      margin-left:-40px;
+      display: block;
+      gap: 10px;
+      z-index: 1;
+      backdrop-filter: blur(5px);
+      padding: 10px;
+      border-radius: 20px;
+      background-color: rgba(0, 0, 0, 0.5); /* Dark background for contrast */
+    }
+    .vertical-indicators button {
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+      border: none;
+      transition: background-color 0.3s ease;
+      padding:0;
+    }
+    .vertical-indicators button.active {
+      background-color: #ff6550;
+      width: 15px;
+      height: 15px;
+    }
+  </style>
     <style>
         body {
             font-family: 'Trirong', sans-serif;
@@ -533,7 +622,6 @@ background: #ffffff;
       text-align: center;
       position: relative;
       color: black;
-      margin-top: -24px;
     }
 
 
@@ -615,7 +703,7 @@ background: #ffffff;
 <body>
 
     <div class="off-canvas" id="offCanvasMenu">
-                <button class="menu-toggle" onclick="toggleMenu()" style=" padding: 0; margin: -10px;"><i class="fas fa-bars" style="font-size: 39px;height: 50px;width: 50px;position: fixed;right: 25px;z-index: 10001;background-color: #ffffff;border-radius: 5px;color: #198754;padding-top: 6px;"></i>
+                <button class="menu-toggle" onclick="toggleMenu()" style="padding: 0;margin: -10px auto;height: 0px;width: 27px;position: fixed;right: 25px;z-index: 10001;background-color: #ffffff;border-radius: 5px;color: #198754;right: 33px;"><i class="fas fa-bars" style="font-size: 39px;height: 75px;position: absolute;right: 0px;z-index: 10001;background-color: #ffffff;border-radius: 5px;color: #198754;padding-top: 32px;width: 50px;"></i>
 </button>
 
     
@@ -706,7 +794,137 @@ background: #ffffff;
         </div>
     </div>
 
+    <div class="outer-container">
+<div class="container2">
+  <h1>Trend</h1>
+
+  <!-- Bootstrap Carousel for News Slideshow -->
+  <div id="newsCarousel" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner" id="news-feed">
+      <!-- News items will be dynamically added here -->
+    </div>
     
+
+<!-- Vertical Pagination (Carousel Indicators) -->
+    <div class="vertical-indicators">
+      <!-- Indicators will be dynamically added here -->
+    </div>
+
+    <!-- Carousel Controls -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#newsCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#newsCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+  </div>
+
+</div>
+
+</div>
+<script>
+  // Function to load the RSS feed
+  function loadRSSFeed() {
+    const rssFeedUrl = 'https://medlineplus.gov/groupfeeds/new.xml';
+    const proxyUrl = 'https://api.allorigins.win/get?url=' + encodeURIComponent(rssFeedUrl);
+    const newsFeedContainer = document.getElementById('news-feed');
+    const indicatorsContainer = document.querySelector('.vertical-indicators');
+
+    // Fetch the RSS feed using the proxy
+    fetch(proxyUrl)
+      .then(response => response.json())
+      .then(data => {
+        // Parse the XML from the response contents
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data.contents, 'text/xml');
+
+        // Find all the news items in the RSS feed
+        const items = xmlDoc.getElementsByTagName('item');
+
+        // Priority array for items with "drug"
+        let priorityItems = [];
+        let otherItems = [];
+
+        // Loop through each news item and categorize them
+        for (let i = 0; i < items.length; i++) {
+          const title = items[i].getElementsByTagName('title')[0].textContent;
+          const link = items[i].getElementsByTagName('link')[0].textContent;
+          const description = items[i].getElementsByTagName('description')[0].textContent;
+          const pubDate = items[i].getElementsByTagName('pubDate')[0].textContent;
+
+          // Check if the word "drug" appears in the title or description
+          const newsItem = {
+            title: title,
+            link: link,
+            description: description,
+            pubDate: pubDate
+          };
+
+          if (title.toLowerCase().includes('drug') || description.toLowerCase().includes('drug')) {
+            priorityItems.push(newsItem); // Prioritize "drug" items
+          } else {
+            otherItems.push(newsItem); // Store other items separately
+          }
+        }
+
+        // Concatenate priority items with other items and slice to get only 4 news items
+        const allItems = [...priorityItems, ...otherItems].slice(0, 4);
+
+        // Check if any news items are present
+        if (allItems.length > 0) {
+          let newsHtml = '';
+          let indicatorsHtml = '';
+
+          // Loop through each selected news item and create carousel slide for each
+          allItems.forEach((item, index) => {
+            newsHtml += `
+              <div class="carousel-item ${index === 0 ? 'active' : ''}">
+                <div class="news-item">
+                  <h3><a href="${item.link}" target="_blank">${item.title}</a></h3>
+                  <p>${item.description}</p>
+                  <p><small>Published on: ${new Date(item.pubDate).toLocaleDateString()}</small></p>
+                </div>
+              </div>
+            `;
+            indicatorsHtml += `
+              <button type="button" data-bs-target="#newsCarousel" data-bs-slide-to="${index}" class="${index === 0 ? 'active' : ''}" aria-current="${index === 0 ? 'true' : 'false'}" aria-label="Slide ${index + 1}"></button>
+            `;
+          });
+
+          // Replace loading message with news items in carousel
+          newsFeedContainer.innerHTML = newsHtml;
+          indicatorsContainer.innerHTML = indicatorsHtml;
+        } else {
+          newsFeedContainer.innerHTML = '<div class="carousel-item active"><div class="news-item">No news items found.</div></div>';
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching RSS feed:', error);
+        newsFeedContainer.innerHTML = '<div class="carousel-item active"><div class="news-item">Failed to load news.</div></div>';
+      });
+  }
+
+  // Update active state of indicators on slide change
+  const newsCarousel = document.getElementById('newsCarousel');
+  newsCarousel.addEventListener('slide.bs.carousel', function (event) {
+    const indicators = document.querySelectorAll('.vertical-indicators button');
+    indicators.forEach((indicator, index) => {
+      indicator.classList.remove('active');
+      if (index === event.to) {
+        indicator.classList.add('active');
+      }
+    });
+  });
+
+  // Load the RSS feed when the page loads
+  window.onload = loadRSSFeed;
+</script>
+
+<!-- Bootstrap JS and Dependencies -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
 <script>
 
 const currentPageLocation = window.location.href;
