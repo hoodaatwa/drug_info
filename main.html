@@ -41,7 +41,9 @@ margin:-20px;
     background-color: #ffffff;
     background-size: cover;
     background-position: center;
-    margin: 20px -20px;
+    margin: 20px auto 40px;
+    border-radius: 8px;
+    max-width: 700px;
 }
 .outer-container h1 {
     text-align: center;
@@ -120,6 +122,7 @@ margin:-20px;
       width: 15px;
       height: 15px;
     }
+
   </style>
     <style>
         body {
@@ -753,14 +756,15 @@ background: #ffffff;
 
     <!-- New Tools -->
     <div class="tool" id="toggleImagesTool"><i class="bi bi-image"></i><br>Toggle Images</div>
-    <div class="tool" id="toggleParagraphTool"><i class="bi bi-align-center"></i><br>Toggle Paragraphs</div>
+
 
     <div class="tools-container" style="border: 11px dotted #ff6550;">
-      <div class="tool" id="textSizeIncreaseTool"><i class="bi bi-fonts"></i><br>Text Size +</div>
-      <div class="tool" id="textSizeDecreaseTool"><i class="bi bi-fonts"></i><br>Text Size -</div>
-      <div class="tool" id="alignCenterTool"><i class="bi bi-text-center"></i><br>Align Center</div>
-      <div class="tool" id="alignRightTool"><i class="bi bi-text-right"></i><br>Align Right</div>
-      <div class="tool" id="alignLeftTool"><i class="bi bi-text-left"></i><br>Align Left</div>
+    <div class="tool" id="toggleParagraphTool"><i class="bi bi-align-center"></i><br>Toggle Paragraphs</div>
+      <div class="tool" id="textSizeIncreaseTool"><i class="bi bi-fonts"></i><br>Paragraph Text Size +</div>
+      <div class="tool" id="textSizeDecreaseTool"><i class="bi bi-fonts"></i><br>Paragraph Text Size -</div>
+      <div class="tool" id="alignCenterTool"><i class="bi bi-text-center"></i><br>Paragraph Align Center</div>
+      <div class="tool" id="alignRightTool"><i class="bi bi-text-right"></i><br>Paragraph Align Right</div>
+      <div class="tool" id="alignLeftTool"><i class="bi bi-text-left"></i><br>Paragraph Align Left</div>
     </div>
   </div>
 </div>
@@ -795,7 +799,6 @@ background: #ffffff;
     <h1>Drug Information</h1>
 <br >
     <div class="container">
-        
         <input type="text" id="drugName" placeholder="Enter drug name (e.g., acetaminophen)" oninput="suggestDrugs()" onblur="hideSuggestions()" />
         <div id="suggestions" class="suggestions"></div>
         <button class ="search" onclick="fetchDrugData()">Search</button>
