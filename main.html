@@ -922,6 +922,8 @@ background: #ffffff;
     </div>
 </footer>
 <script>
+  let retryAttempts = 0; // Track the number of retries
+
   // Function to load the RSS feed
   function loadRSSFeed() {
     const rssFeedUrl = 'https://medlineplus.gov/groupfeeds/new.xml';
@@ -993,13 +995,22 @@ background: #ffffff;
           // Replace loading message with news items in carousel
           newsFeedContainer.innerHTML = newsHtml;
           indicatorsContainer.innerHTML = indicatorsHtml;
+
+          retryAttempts = 0; // Reset retry attempts on successful load
         } else {
           newsFeedContainer.innerHTML = '<div class="carousel-item active"><div class="news-item">No news items found.</div></div>';
         }
       })
       .catch(error => {
         console.error('Error fetching RSS feed:', error);
-        newsFeedContainer.innerHTML = '<div class="carousel-item active"><div class="news-item">Failed to load news.</div></div>';
+        // Retry mechanism: reload feed after 5 seconds, up to 3 retries
+        retryAttempts++;
+        if (retryAttempts <= 3) {
+          setTimeout(loadRSSFeed, 5000); // Retry after 5 seconds
+        } else {
+          // Display error message after max retries
+          newsFeedContainer.innerHTML = '<div class="carousel-item active"><div class="news-item">Failed to load news. Please try again later.</div></div>';
+        }
       });
   }
 
