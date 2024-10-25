@@ -1289,7 +1289,7 @@ document.getElementById('loading').style.display = 'block';
         if (error.message.includes("Cannot read properties of undefined (reading 'results')")) {
             document.getElementById('error').innerHTML =  `No data found. Please pick one of the suggested options from the list.
             <br>
-            <button id="googleSearchButton" onclick="googleSearch('${drugName}')">
+            <button id="googleSearchButton" onclick="window.location.href='https://www.google.com/search?q=' + encodeURIComponent('${drugName}')">
                 <img src="https://www.google.com/favicon.ico" alt="Google Logo">
                 Search "${drugName}" on Google
             </button>
